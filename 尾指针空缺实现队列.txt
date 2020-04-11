@@ -1,0 +1,91 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+//#include<unistd.h>
+
+// 循环队列
+
+// front : 队头元素位置
+//rear: 队尾元素位置
+//size
+
+// front : 队头元素位置
+// rear：队尾元素的下一个位置
+// front == rear 空
+// 满 (rear+1)%长度 == front
+
+#define false 0
+#define true 1
+typedef struct{
+	int _front; // 首元素位置
+	int _rear; // 尾元素位置
+	//int _size; // 当前元素的个数
+	int _k; // 容量 
+	int* _array;
+}MyCircleQueue;
+
+// 创建能存放k个元素的循环队列
+MyCircleQueue* createMyCircleQueue(int k){
+	MyCircleQueue* mq = (MyCircleQueue*)malloc(sizeof(MyCircleQueue));
+	mq->_k = k; // 容量，可以存放的元素个数
+	// 无size，多申请一个空间
+	mq->_array = (int*)malloc(sizeof(int)*(mq->_k +1));
+	mq->_front = 0;
+	mq->_rear = 0;
+	//mq->_size = 0;
+	return mq;
+}
+
+int MyCircleQueueEnQueue(MyCircleQueue* obj, int val){
+	if ((obj->_rear + 1) % (obj->_k + 1) == obj->_front) // 满了,数组的长度是加上1，包括那一个空的位置
+		return false;
+	obj->_array[obj->_rear++] = val;
+	// 保证循环结构
+	if (obj->_rear == obj->_k +1)
+		obj->_rear = 0;
+	//obj->_size++;
+	return true;
+}
+
+int MyCircleQueueDeQueue(MyCircleQueue* obj){
+	if (obj->_front == obj->_rear) // 为空
+		return false;
+	// 头删
+	obj->_front++;
+	if (obj->_front == obj->_k + 1)
+		obj->_front = 0;
+	//obj->_size--;
+	return true;
+}
+
+int MyCircleQueueFront(MyCircleQueue* obj){
+	if (obj->_front == obj->_rear)
+		return -1;
+	return obj->_array[obj->_front];
+}
+int MyCircleQueueBack(MyCircleQueue* obj){
+	if (obj->_front == obj->_rear)
+		return -1;
+	if (obj->_rear == 0)
+		return obj->_array[obj->_k];
+	return obj->_array[obj->_rear - 1];
+}
+int MyCircleQueueIsEmpty(MyCircleQueue* obj){
+	if (obj->_front == obj->_rear){
+		return true;
+	}
+	return false;
+
+}
+int MyCircleQueueIsFull(MyCircleQueue* obj){
+	if ((obj->_rear + 1) %(obj->_k +1)== obj->_front){
+		return true;
+	}
+	return false;
+}
+
+void MyCircleQueueFree(MyCircleQueue* obj){
+	free(obj->_array);
+	free(obj);
+}
